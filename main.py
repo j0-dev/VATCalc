@@ -62,7 +62,15 @@ def calc(event=None):
     except ValueError as error:
         print(f"Error: {error}")
 
+# Button presses
+def button_press(value):
+    current_text = net_entry.get()
+    net_entry.delete(0, tk.END)    # Specifies the range of characters to delete.
+    net_entry.insert(0, current_text + value)
 
+# Clear entry
+def clear():
+    net_entry.delete(0, tk.END)
 
 ### GUI ###
 
@@ -73,7 +81,7 @@ if __name__ == "__main__":
     root.title("VAT Calculator")
 
     # Window styling
-    root.geometry("320x480")
+    root.geometry("370x525")
     root.resizable(False, False)
 
     # Styling
@@ -107,9 +115,23 @@ if __name__ == "__main__":
     header_label.grid(column=0, row=0, columnspan=3, pady=(0, 20))
 
     # Input
-    # tkb.Label(frame, text="Enter net amount (excluding VAT):").grid(column=1, row=1, pady=(10, 5))
-    # net_entry = tk.Entry(frame, justify="center")
-    # net_entry.grid(column=1, row=2, pady=(0,10))
+    tkb.Label(frame, text="Enter net amount (excluding VAT):\n").grid(column=0, row=1, columnspan=3, pady=(10, 5))
+    net_entry = tkb.Entry(frame, justify="center")
+    net_entry.grid(column=0, row=2, columnspan=3, pady=(0,10), ipady=5, ipadx=50)
+
+    # Numpad
+    numpad_frame = tkb.Frame(frame)
+    numpad_frame.grid(column=0, row=3, columnspan=3, pady=(10, 20))
+    buttons = [
+        ("7", 1, 0), ("8", 1, 1), ("9", 1, 2), 
+        ("4", 2, 0), ("5", 2, 1), ("6", 2, 2), 
+        ("1", 3, 0), ("2", 3, 1), ("3", 3, 2), 
+        ("C", 4, 0), ("0", 4, 1), (" . ", 4, 2), 
+    ]
+
+    for (text, row, col) in buttons:    # Loop to create each button
+        action = lambda x=text: button_press(x) if x != 'C' else clear()
+        tkb.Button(numpad_frame, text=text, command=action).grid(row=row, column=col, padx=5, pady=5, ipadx=10, ipady=10)
 
     # Grid
     frame.columnconfigure(0, weight=1)
