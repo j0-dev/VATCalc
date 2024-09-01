@@ -13,14 +13,20 @@ import ttkbootstrap as tkb
 ### FUNCTIONS ### 
 
 
-# VAT calculation function
+# VAT calculation function (NOW UNUSED)
 def vat(net):
     rate = 0.2
     amount = net * rate
     gross = net + amount
     return gross
 
+# # Console test
+# if __name__ == "__main__":
+#     net = float(input("Net amount (excluding VAT): £"))
+#     gross = vat(net)
+#     print(f"Gross amount (including VAT): £{gross:.2f}")
 # Check for decimal
+
 def decimal(value, max=2):
     try:
         float_value = float(value)
@@ -39,6 +45,10 @@ def add_vat():
         # Check for empty input
         if not input_value:
             raise ValueError("Input must not be empty.")
+        
+        # Check for leading zeroes
+        if input_value.startswith("0") and not input_value.startswith("0."):
+            raise ValueError("Input cannot have leading zeroes.")
         
         # Check for non-number
         if not input_value.replace(".", "", 1).isdigit():
@@ -67,8 +77,7 @@ def add_vat():
         net_entry.insert(0, f"{result:.2f}")
 
     except ValueError as e:
-        net_entry.delete(0, tk.END)
-        net_entry.insert(0, str(e))
+        error_label.config(text=str(e))
 
 def remove_vat():
     try:
@@ -78,6 +87,10 @@ def remove_vat():
         # Check for empty input
         if not input_value:
             raise ValueError("Input must not be empty.")
+        
+        # Check for leading zeroes
+        if input_value.startswith("0") and not input_value.startswith("0."):
+            raise ValueError("Input cannot have leading zeroes.")
         
         # Check for non-number
         if not input_value.replace(".", "", 1).isdigit():
@@ -106,15 +119,7 @@ def remove_vat():
         net_entry.insert(0, f"{result:.2f}")
 
     except ValueError as e:
-        net_entry.delete(0, tk.END)
-        net_entry.insert(0, str(e))
-
-
-# # Console test
-# if __name__ == "__main__":
-#     net = float(input("Net amount (excluding VAT): £"))
-#     gross = vat(net)
-#     print(f"Gross amount (including VAT): £{gross:.2f}")
+        error_label.config(text=str(e))
 
 # Button presses
 def button_press(value):
@@ -125,9 +130,11 @@ def button_press(value):
 # Clear entry
 def clear():
     net_entry.delete(0, tk.END)
+    error_label.config(text="")
+
+
 
 ### GUI ###
-
 
 # Main
 if __name__ == "__main__":
@@ -171,6 +178,10 @@ if __name__ == "__main__":
     # Input
     net_entry = tkb.Entry(frame, justify="center", font=main_font)
     net_entry.grid(column=0, row=2, columnspan=3, pady=(10,10), ipady=5, ipadx=50)
+
+    # Error
+    error_label = tkb.Label(frame, text="", font=main_font, foreground="red")
+    error_label.grid(column=0, row=1, columnspan=3)
 
     # Numpad
     numpad_frame = tkb.Frame(frame)
