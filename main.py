@@ -212,7 +212,7 @@ if __name__ == "__main__":
 
     # Error
     error_label = tkb.Label(frame, text="", font=main_font, foreground="red")
-    error_label.grid(column=0, row=1, columnspan=3)
+    error_label.grid(column=0, row=1, columnspan=3, ipady=15)
 
     # Numpad
     numpad_frame = tkb.Frame(frame)
@@ -246,9 +246,8 @@ if __name__ == "__main__":
     input_frame.columnconfigure(2, weight=1)
 
     # Binds
-    if not net_entry.get():
-        net_entry.insert(0, "£")
     net_entry.bind("<KeyRelease>", keep_pound_sign)
+    net_entry.bind("")
 
     # Event loop
     root.configure(bg=bg_colour)
