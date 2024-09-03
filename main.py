@@ -39,7 +39,7 @@ def decimal(value, max=2):
 def add_vat():
     try:
         # Retrieve and clean input
-        input_value = net_entry.get().strip()
+        input_value = net_entry.get().strip().replace("£", "")
 
         # Check for empty input
         if not input_value:
@@ -73,15 +73,15 @@ def add_vat():
 
         # Update entry
         net_entry.delete(0, tk.END)
-        net_entry.insert(0, f"{result:.2f}")
+        net_entry.insert(0, f"£{result:.2f}")
 
     except ValueError as e:
         error_label.config(text=str(e))
 
 def remove_vat():
     try:
-        # Retrieve input
-        input_value = net_entry.get().strip()
+        # Retrieve and clean input
+        input_value = net_entry.get().strip().replace("£", "")
 
         # Check for empty input
         if not input_value:
@@ -115,7 +115,7 @@ def remove_vat():
 
         # Update entry
         net_entry.delete(0, tk.END)
-        net_entry.insert(0, f"{result:.2f}")
+        net_entry.insert(0, f"£{result:.2f}")
 
     except ValueError as e:
         error_label.config(text=str(e))
@@ -132,12 +132,23 @@ def button_press(value):
         if len(decimal) >= 2 and value != 'C':
             return
         
+    if current_text == "£" and value == "C":    # Ignore £ sign being removed.
+        clear()
+        return
+        
+    if current_text == "£" and value == "C":    # Ensure £ sign stays at start.
+        net_entry.insert(tk.END, value)
+    else:
+        net_entry.delete(0, tk.END)
+        net_entry.insert(0, current_text + value)
+
     net_entry.delete(0, tk.END)    # Specifies the range of characters to delete.
     net_entry.insert(0, current_text + value)
 
 # Clear entry
 def clear():
     net_entry.delete(0, tk.END)
+    net_entry.insert(0, "£")
     error_label.config(text="")
 
 
@@ -186,11 +197,9 @@ if __name__ == "__main__":
     # Input
     input_frame = tkb.Frame(frame)
     input_frame.grid(column=0, row=2, columnspan=3, pady=(0, 20), sticky=(tk.E, tk.W))
-    pound_sign = tkb.Label(input_frame, text="£", font=result_font, background=bg_colour, foreground=fg_colour)
-    pound_sign.grid(row=0, column=0, padx=(0, 5), sticky=(tk.E)) 
     net_entry = tkb.Entry(input_frame, justify="right", font=main_font, width=20)
     net_entry.grid(row=0, column=1, sticky=(tk.W))
-
+    net_entry.insert(0, "£")
 
     # Error
     error_label = tkb.Label(frame, text="", font=main_font, foreground="red")
