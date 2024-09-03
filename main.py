@@ -12,7 +12,6 @@ import ttkbootstrap as tkb
 
 ### FUNCTIONS ### 
 
-
 # VAT calculation function (NOW UNUSED)
 def vat(net):
     rate = 0.2
@@ -30,11 +29,11 @@ def vat(net):
 def decimal(value, max=2):
     try:
         float_value = float(value)
-        str_value = f"{float_value:.10f}"
+        str_value = f"{float_value:.{max}f}"
         _, pence = str_value.split(".")
-        return len(pence.rstrip('0')) <= max
+        return len(pence) == max
     except ValueError:
-        return True
+        return False
     
 # Add VAT function
 def add_vat():
@@ -48,11 +47,11 @@ def add_vat():
         
         # Check for leading zeroes
         if input_value.startswith("0") and not input_value.startswith("0."):
-            raise ValueError("Input cannot have leading zeroes.")
+            raise ValueError("Remove leading zeroes.")
         
         # Check for non-number
         if not input_value.replace(".", "", 1).isdigit():
-            raise ValueError("Input must be numeric.")
+            raise ValueError("Input must be a valid number.")
 
         # Check for decimal
         if not decimal(input_value):
@@ -90,15 +89,15 @@ def remove_vat():
         
         # Check for leading zeroes
         if input_value.startswith("0") and not input_value.startswith("0."):
-            raise ValueError("Input cannot have leading zeroes.")
+            raise ValueError("Remove leading zeroes.")
         
         # Check for non-number
         if not input_value.replace(".", "", 1).isdigit():
-            raise ValueError("Input must be numeric.")
+            raise ValueError("Input must be a valid number.")
 
         # Check for decimal
         if not decimal(input_value):
-            raise ValueError("Invalid input.")
+            raise ValueError("Pence must be two decimals.")
         
         # Convert input
         gross = float(input_value)
@@ -124,6 +123,15 @@ def remove_vat():
 # Button presses
 def button_press(value):
     current_text = net_entry.get()
+
+    if value == '.' and '.' in current_text:    # Don't allow 2 decimal points.
+        return
+    
+    if '.' in current_text:    # Don't allow more than 2 decimal places.
+        whole, decimal = current_text.split('.')
+        if len(decimal) >= 2 and value != 'C':
+            return
+        
     net_entry.delete(0, tk.END)    # Specifies the range of characters to delete.
     net_entry.insert(0, current_text + value)
 
@@ -172,12 +180,17 @@ if __name__ == "__main__":
     root.rowconfigure(0, weight=1)
 
     # Header
-    header_label = tkb.Label(frame, text="VAT Calculator", font=title_font, anchor="center")
+    header_label = tkb.Label(frame, text="VAT Calculator", font=title_font, anchor=("center"))
     header_label.grid(column=0, row=0, columnspan=3, pady=(0, 20))
 
     # Input
-    net_entry = tkb.Entry(frame, justify="center", font=main_font)
-    net_entry.grid(column=0, row=2, columnspan=3, pady=(10,10), ipady=5, ipadx=50)
+    input_frame = tkb.Frame(frame)
+    input_frame.grid(column=0, row=2, columnspan=3, pady=(0, 20), sticky=(tk.E, tk.W))
+    pound_sign = tkb.Label(input_frame, text="£", font=result_font, background=bg_colour, foreground=fg_colour)
+    pound_sign.grid(row=0, column=0, padx=(0, 5), sticky=(tk.E)) 
+    net_entry = tkb.Entry(input_frame, justify="right", font=main_font, width=20)
+    net_entry.grid(row=0, column=1, sticky=(tk.W))
+
 
     # Error
     error_label = tkb.Label(frame, text="", font=main_font, foreground="red")
@@ -191,17 +204,17 @@ if __name__ == "__main__":
         ("4", 2, 0), ("5", 2, 1), ("6", 2, 2), 
         ("1", 3, 0), ("2", 3, 1), ("3", 3, 2), 
         ("C", 4, 0), ("0", 4, 1), (".", 4, 2), 
-    ]
+        ]
 
     for (text, row, col) in buttons:    # Loop to create each button
         action = lambda x=text: button_press(x) if x != 'C' else clear()
         tkb.Button(numpad_frame, text=text, command=action).grid(row=row, column=col, padx=5, pady=5, ipadx=15, ipady=10)
 
 
-    add_vat_button = tkb.Button(frame, text="Add VAT", width=10, command=add_vat)
+    add_vat_button = tkb.Button(frame, text="Add VAT (+)", width=10, command=add_vat)
     add_vat_button.grid(column=0, row=5, pady=(20, 20), padx=10, ipady=10, sticky=(tk.W, tk.E))
 
-    minus_vat_button = tkb.Button(frame, text="Remove VAT", width=10, command=remove_vat)
+    minus_vat_button = tkb.Button(frame, text="Remove VAT (-)", width=10, command=remove_vat)
     minus_vat_button.grid(column=2, row=5, pady=(20, 20), padx=10, ipady=10, sticky=(tk.W, tk.E))
 
     # Grid
@@ -210,6 +223,11 @@ if __name__ == "__main__":
     frame.columnconfigure(2, weight=1)
     frame.rowconfigure(1, weight=0)
     frame.rowconfigure(2, weight=0)
+    input_frame.columnconfigure(0, weight=1)
+    input_frame.columnconfigure(1, weight=0)
+    input_frame.columnconfigure(2, weight=1)
+
+    # Binds
 
     # Event loop
     root.configure(bg=bg_colour)
