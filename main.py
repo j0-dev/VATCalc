@@ -142,8 +142,17 @@ def button_press(value):
         net_entry.delete(0, tk.END)
         net_entry.insert(0, current_text + value)
 
-    net_entry.delete(0, tk.END)    # Specifies the range of characters to delete.
-    net_entry.insert(0, current_text + value)
+# Keep £ sign
+def keep_pound_sign(event=None):
+    current_text = net_entry.get()
+
+    if not current_text.startswith("£"):
+        current_text = current_text.replace("£", "")
+        net_entry.delete(0, tk.END)
+        net_entry.insert(0, "£" + current_text)
+
+    net_entry.icursor(tk.END)
+
 
 # Clear entry
 def clear():
@@ -237,6 +246,9 @@ if __name__ == "__main__":
     input_frame.columnconfigure(2, weight=1)
 
     # Binds
+    if not net_entry.get():
+        net_entry.insert(0, "£")
+    net_entry.bind("<KeyRelease>", keep_pound_sign)
 
     # Event loop
     root.configure(bg=bg_colour)
