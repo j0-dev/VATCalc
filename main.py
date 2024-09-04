@@ -35,8 +35,8 @@ def decimal(value, max=2):
     except ValueError:
         return False
     
-# Add VAT function
-def add_vat():
+# VAT functions
+def add_vat(event=None):
     try:
         # Retrieve and clean input
         input_value = net_entry.get().strip().replace("£", "")
@@ -153,12 +153,30 @@ def keep_pound_sign(event=None):
 
     net_entry.icursor(tk.END)
 
-
 # Clear entry
 def clear():
     net_entry.delete(0, tk.END)
     net_entry.insert(0, "£")
     error_label.config(text="")
+
+# Event handlers (bindings)
+def add_vat_event_handler(event=None):
+    current_value = net_entry.get()
+    cleaned_value = current_value.replace("+", "")
+    net_entry.delete(0, tk.END)
+    net_entry.insert(0, cleaned_value)
+
+    add_vat()
+    return "break"
+
+def remove_vat_event_handler(event=None):
+    current_value = net_entry.get()
+    cleaned_value = current_value.replace("-", "")
+    net_entry.delete(0, tk.END)
+    net_entry.insert(0, cleaned_value)
+
+    remove_vat()
+    return "break"
 
 
 
@@ -234,8 +252,8 @@ if __name__ == "__main__":
     add_vat_button = tkb.Button(frame, text="Add VAT (+)", width=10, command=add_vat)
     add_vat_button.grid(column=0, row=5, pady=(20, 20), padx=10, ipady=10, sticky=(tk.W, tk.E))
 
-    minus_vat_button = tkb.Button(frame, text="Remove VAT (-)", width=10, command=remove_vat)
-    minus_vat_button.grid(column=2, row=5, pady=(20, 20), padx=10, ipady=10, sticky=(tk.W, tk.E))
+    remove_vat_button = tkb.Button(frame, text="Remove VAT (-)", width=10, command=remove_vat)
+    remove_vat_button.grid(column=2, row=5, pady=(20, 20), padx=10, ipady=10, sticky=(tk.W, tk.E))
 
     # Grid
     frame.columnconfigure(0, weight=1)
@@ -248,10 +266,12 @@ if __name__ == "__main__":
     input_frame.columnconfigure(2, weight=1)
 
     # Binds
-    root.bind("<plus>", lambda event: add_vat())
-    root.bind("<minus>", lambda event: add_vat())
+    root.bind("<plus>", add_vat_event_handler)
+    root.bind("<Return>", add_vat_event_handler)
+    root.bind("<minus>", remove_vat_event_handler)
+    root.bind("<Delete>", lambda event: clear())
+    root.bind("<BackSpace>", lambda event: clear())
     net_entry.bind("<KeyRelease>", keep_pound_sign)
-    net_entry.bind("")
 
     # Event loop
     root.configure(bg=bg_colour)
