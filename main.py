@@ -209,6 +209,8 @@ if __name__ == "__main__":
     net_entry = tkb.Entry(input_frame, justify="right", font=main_font, width=20)
     net_entry.grid(row=0, column=1, sticky=(tk.W))
     net_entry.insert(0, "£")
+    net_entry.configure(takefocus=1)
+    net_entry.focus_set()
 
     # Error
     error_label = tkb.Label(frame, text="", font=main_font, foreground="red")
@@ -246,6 +248,8 @@ if __name__ == "__main__":
     input_frame.columnconfigure(2, weight=1)
 
     # Binds
+    root.bind("<plus>", lambda event: add_vat())
+    root.bind("<minus>", lambda event: add_vat())
     net_entry.bind("<KeyRelease>", keep_pound_sign)
     net_entry.bind("")
 
