@@ -178,7 +178,7 @@ def remove_vat_event_handler(event=None):
     remove_vat()
     return "break"
 
-
+    
 
 ### GUI ###
 
@@ -267,7 +267,6 @@ if __name__ == "__main__":
 
     # Binds
     root.bind("<plus>", add_vat_event_handler)
-    root.bind("<Return>", add_vat_event_handler)
     root.bind("<minus>", remove_vat_event_handler)
     root.bind("<Delete>", lambda event: clear())
     root.bind("<BackSpace>", lambda event: clear())
